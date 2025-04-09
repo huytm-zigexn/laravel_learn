@@ -24,6 +24,8 @@
                 <option value="{{ $group->id }}">{{ $group->name }}</option>
             @endforeach
         </select> <br>
+        <label for="due_date">Due Date:</label><br>
+        <input type="datetime-local" name="due_date"><br>
         <label for="">Assign to users:</label><br>
         @foreach ($users as $user)
             <input type="checkbox" name="users[]" value="{{ $user->id }}">

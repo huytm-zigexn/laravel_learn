@@ -28,6 +28,6 @@ class TaskPolicy
      */
     public function delete(User $user, Task $task): bool
     {
-        return $task->users->contains($user);
+        return $task->users->contains($user->id);
     }
 }

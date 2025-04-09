@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Models\Group;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
@@ -28,11 +29,12 @@ class TasksController extends Controller
     public function store(Request $request)
     {
         $thumbnailPath = null;
-
+        
         $request->validate([
             'name' => 'required|alpha_dash:ascii|max:255',
             'description' => 'nullable',
             'group_id' => 'required|exists:groups,id',
+            'due_date' => 'nullable|date|after:now',
             'thumbnail' => 'nullable|image|max:2048',
             'users' => 'nullable|array',
             'users.*' => 'exists:users,id',
@@ -41,11 +43,16 @@ class TasksController extends Controller
         if ($request->hasFile('thumbnail')) {
             $thumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
         }
+        
+        $dueDate = $request->due_date 
+            ? Carbon::parse($request->due_date)->format('Y-m-d\TH:i')
+            : null;
 
         $task = Task::create([
             'name' => $request->name,
             'description' => $request->description,
             'group_id' => $request->group_id,
+            'due_date' => $dueDate,
             'thumbnail' => $thumbnailPath,
             'created_at' => now(),
             'updated_at' => now(),
@@ -78,6 +85,7 @@ class TasksController extends Controller
             'name' => 'required|alpha_dash:ascii|max:255',
             'description' => 'nullable',
             'group_id' => 'required|exists:groups,id',
+            'due_date' => 'nullable|date|after:now',
             'thumbnail' => 'nullable|image|max:2048',
             'users' => 'nullable|array',
             'users.*' => 'exists:users,id',
@@ -86,6 +94,8 @@ class TasksController extends Controller
         if ($request->hasFile('thumbnail')) {
             $thumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
         }
+        
+        $dueDate = $request->due_date ? Carbon::parse($request->due_date) : null;
 
         $task = Task::findOrFail($id);
 
@@ -93,6 +103,7 @@ class TasksController extends Controller
             'name' => $request->name,
             'description' => $request->description,
             'group_id' => $request->group_id,
+            'due_date' => $dueDate,
             'thumbnail' => $thumbnailPath,
             'updated_at' => now()
         ]);
@@ -103,7 +114,7 @@ class TasksController extends Controller
 
     public function delete(string $id)
     {
-        $task = Task::where('id', $id);
+        $task = Task::findOrFail($id);
         Gate::authorize('delete', $task);
         $task->delete();
         return redirect()->route('app')->with('success', 'Task deleted successfully!');

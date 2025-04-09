@@ -12,7 +12,7 @@ class Task extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'group_id', 'thumbnail'];
+    protected $fillable = ['name', 'description', 'group_id', 'thumbnail', 'due_date'];
 
     public function group(): BelongsTo
     {

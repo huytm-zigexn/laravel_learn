@@ -30,6 +30,9 @@
             <input type="checkbox" name="users[]" value="{{ $user->id }}" {{ in_array($user->id, $task->users->pluck('id')->toArray()) ? 'checked' : '' }}>
             {{ $user->name }} <br>
         @endforeach
+        <label for="due_date">Due Date:</label><br>
+        <input type="datetime-local" name="due_date" value="{{ \Carbon\Carbon::parse($task->due_date)->format('Y-m-d\TH:i') }}"><br>
+
         <label for="thumbnail">Thumbnail:</label><br>
         <input type="file" name="thumbnail"><br><br>
         @if($task->thumbnail)

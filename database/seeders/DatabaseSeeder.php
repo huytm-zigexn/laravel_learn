@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Task;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -18,9 +19,16 @@ class DatabaseSeeder extends Seeder
             ->hasTasks(5) // Each group has 5 tasks
             ->create();
 
-        \App\Models\User::factory()
+        $users = \App\Models\User::factory()
             ->count(10)
             ->create();
+
+        $tasks = Task::all();
+
+        foreach ($tasks as $task) {
+            $randomUsers = $users->random(rand(1, 3))->pluck('id')->toArray();
+            $task->users()->attach($randomUsers);
+        }
     }
 
 }
