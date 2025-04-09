@@ -1,9 +1,18 @@
 @extends('app')
 
 @section ('content')
+    <h2>Register</h2>
+    @if ($errors->any())
+        <div style="color: red;">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <form action="/register" method="POST">
         @csrf
-        <h2>Register</h2>
         <label for="name">Name</label><br>
         <input type="text" name="name" placeholder="Input your name"><br>
         <label for="Email">Email</label><br>

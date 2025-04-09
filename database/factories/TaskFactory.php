@@ -20,7 +20,7 @@ class TaskFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->sentence(3),
+            'name' => $this->faker->slug(3),
             'description' => $this->faker->paragraph,
             'group_id' => \App\Models\Group::factory(),
         ];

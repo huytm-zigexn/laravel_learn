@@ -2,6 +2,15 @@
 
 @section('content')
     <h2>Create Task</h2>
+    @if ($errors->any())
+        <div style="color: red;">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <form action="/tasks" method="POST" enctype="multipart/form-data">
         @csrf
         <input type="text" name="name" placeholder="Input task name"><br>
