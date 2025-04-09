@@ -17,6 +17,10 @@ class DatabaseSeeder extends Seeder
             ->count(10)
             ->hasTasks(5) // Each group has 5 tasks
             ->create();
+
+        \App\Models\User::factory()
+            ->count(10)
+            ->create();
     }
 
 }

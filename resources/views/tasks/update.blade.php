@@ -25,6 +25,11 @@
                 <option {{ $group->id == $task->group_id ? 'selected' : '' }} value="{{ $group->id }}">{{ $group->name }}</option>
             @endforeach
         </select> <br>
+        <label for="">Assign to users:</label><br>
+        @foreach ($users as $user)
+            <input type="checkbox" name="users[]" value="{{ $user->id }}" {{ in_array($user->id, $task->users->pluck('id')->toArray()) ? 'checked' : '' }}>
+            {{ $user->name }} <br>
+        @endforeach
         <label for="thumbnail">Thumbnail:</label><br>
         <input type="file" name="thumbnail"><br><br>
         @if($task->thumbnail)
