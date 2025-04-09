@@ -64,9 +64,6 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-    ];
-
-    protected $routeMiddleware = [
-        'validate-task-id' => \App\Http\Middleware\ValidateIdOnURL::class,
+        'validate.task.id' => \App\Http\Middleware\ValidateIdOnURL::class,
     ];
 }

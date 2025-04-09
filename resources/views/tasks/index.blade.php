@@ -1,7 +1,12 @@
 @extends('app')
 
 @section('content')
-    <h2>List of tasks</h2>
+    <div style="display: flex; align-items: center; justify-content: space-between">
+        <h2>List of tasks</h2>
+        <a href="/tasks">
+            <button>Create new task</button>
+        </a>
+    </div>
     @foreach ($tasks as $task)
         <div style="display: flex; align-items:center; justify-content: space-between ;background-color: bisque; border-radius: 10px; margin-bottom: 10px; padding-right: 20px">
             <a style="text-decoration: none; padding: 20px; color: black;" href="/tasks/{{ $task->id }}">

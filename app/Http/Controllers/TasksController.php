@@ -3,40 +3,46 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redis;
+use App\Models\Task;
+use App\Models\Group;
 
 class TasksController extends Controller
 {
     public function index()
     {
-        $tasks = DB::table('tasks')->get();
+        $tasks = Task::get();
         return view('tasks.index', compact('tasks'));
     }
 
     public function create()
     {
-        return view('tasks.create');
+        $groups = Group::get();
+        return view('tasks.create', compact('groups'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'description' => 'required',
-        ]);
+        $thumbnailPath = null;
 
-        $id = DB::table('tasks')->insertGetId([
+        $request->validate([
+            'name' => 'required|alpha_dash:ascii|max:255',
+            'description' => 'nullable',
+            'group_id' => 'required|exists:groups,id',
+            'thumbnail' => 'nullable|image|max:2048'
+        ]);
+        
+        if ($request->hasFile('thumbnail')) {
+            $thumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
+        }
+
+        Task::create([
             'name' => $request->name,
             'description' => $request->description,
-            'group_id' => 1,
+            'group_id' => $request->group_id,
+            'thumbnail' => $thumbnailPath,
             'created_at' => now(),
             'updated_at' => now(),
-        ]);
-
-        DB::table('tasks')->where('id', $id)->update([
-            'group_id' => $id,
         ]);
 
         return redirect()->route('app')->with('success', 'Task created successfully!');
@@ -45,24 +51,35 @@ class TasksController extends Controller
     public function update(string $id)
     {
         $task = $this->find_by_id($id);
+        $groups = Group::get();
 
         if(!$task)
         {
             abort(404);
         }
-        return view('tasks.update', compact('task'));
+        return view('tasks.update', compact('task', 'groups'));
     }
 
     public function edit(Request $request, string $id)
     {
+        $thumbnailPath = null;
+
         $request->validate([
-            'name' => 'required',
-            'description' => 'required',
+            'name' => 'required|alpha_dash:ascii|max:255',
+            'description' => 'nullable',
+            'group_id' => 'required|exists:groups,id',
+            'thumbnail' => 'nullable|image|max:2048'
         ]);
 
-        DB::table('tasks')->where('id', $id)->update([
+        if ($request->hasFile('thumbnail')) {
+            $thumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
+        }
+
+        Task::where('id', $id)->update([
             'name' => $request->name,
             'description' => $request->description,
+            'group_id' => $request->group_id,
+            'thumbnail' => $thumbnailPath,
             'updated_at' => now()
         ]);
 
@@ -71,12 +88,12 @@ class TasksController extends Controller
 
     public function delete(string $id)
     {
-        DB::table('tasks')->where('id', $id)->delete();
+        Task::where('id', $id)->delete();
         return redirect()->route('app')->with('success', 'Task deleted successfully!');
     }
 
     private function find_by_id(string $id)
     {
-        return DB::table('tasks')->find($id);
+        return Task::find($id);
     }
 }
