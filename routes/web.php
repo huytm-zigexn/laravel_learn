@@ -18,24 +18,24 @@ use App\Http\Middleware\ValidateIdOnURL;
 */
 
 
-Route::get('/register', [UserController::class, 'get_register']);
-Route::post('/register', [UserController::class, 'register']);
+Route::get('/register', [UserController::class, 'get_register'])->name('get_register');
+Route::post('/register', [UserController::class, 'register'])->name('register');
 
-Route::get('/login', [UserController::class, 'get_login'])->name('login');
-Route::post('/login', [UserController::class, 'login']);
+Route::get('/login', [UserController::class, 'get_login'])->name('get_login');
+Route::post('/login', [UserController::class, 'login'])->name('login');
 
-Route::post('/logout', [UserController::class, 'logout']);
+Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
 
 Route::middleware('auth')->group(function() {
     Route::get('/', [TasksController::class, 'index'])->name('app');
-    Route::get('/tasks', [TasksController::class, 'create']);
-    Route::post('/tasks', [TasksController::class, 'store']);
+    Route::get('/tasks', [TasksController::class, 'create'])->name('get_create_task');
+    Route::post('/tasks', [TasksController::class, 'store'])->name('create_task');
     
     
     Route::group([], function() {
-        Route::get('/tasks/{id}', [TasksController::class, 'update']);
-        Route::put('/tasks/{id}', [TasksController::class, 'edit'])->name('tasks.edit');
-        Route::delete('/tasks/{id}', [TasksController::class, 'delete']);
+        Route::get('/tasks/{id}', [TasksController::class, 'update'])->name('get_update_task');
+        Route::put('/tasks/{id}', [TasksController::class, 'edit'])->name('update_task');
+        Route::delete('/tasks/{id}', [TasksController::class, 'delete'])->name('delete_task');
     })->middleware('validate-task-id');
 });

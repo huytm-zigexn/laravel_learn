@@ -11,7 +11,7 @@
             </ul>
         </div>
     @endif
-    <form action="/login" method="POST">
+    <form action={{ route('login') }} method="POST">
         @csrf
         <label for="name">Name</label><br>
         <input type="text" name="name" placeholder="Input your name"><br>
@@ -19,7 +19,7 @@
         <input type="email" name="email" id="" placeholder="Input your email"><br>
         <label for="password">password</label><br>
         <input type="password" name="password" id=""><br>
-        <a href="/register">Register</a>
+        <a href={{ route('get_register') }}>Register</a>
         <input type="submit" value="Login">
     </form>
 @endsection

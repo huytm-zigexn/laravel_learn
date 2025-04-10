@@ -11,7 +11,7 @@
             </ul>
         </div>
     @endif
-    <form action="/tasks" method="POST" enctype="multipart/form-data">
+    <form action={{ route('create_task') }} method="POST" enctype="multipart/form-data">
         @csrf
         <label for="name">Task name:</label><br>
         <input type="text" name="name" placeholder="Input task name"><br>

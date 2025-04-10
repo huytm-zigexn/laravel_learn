@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequestValidate;
+use App\Http\Requests\RegisterRequestValidate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
@@ -21,16 +23,10 @@ class UserController extends Controller
 
     }
 
-    public function register(Request $request)
+    public function register(RegisterRequestValidate $request)
     {
-        $inputs = $request->validate([
-            'name'=> 'required|string|max:30',
-            'email' => 'required|unique:users,email|string',
-            'password' => 'required|min:6|string'
-        ]);
-
-        $inputs['password'] = bcrypt($inputs['password']);
-        $user = User::create($inputs);
+        $request['password'] = bcrypt($request['password']);
+        $user = User::create($request->validated());
         Auth::login($user);
 
         return redirect('/');
@@ -41,15 +37,9 @@ class UserController extends Controller
         return view('auth.register');
     }
 
-    public function login(Request $request)
+    public function login(LoginRequestValidate $request)
     {
-        $inputs = $request->validate([
-            'name'=> 'required',
-            'email' => 'required',
-            'password' => 'required'
-        ]);
-
-        if (Auth::attempt($inputs)) {
+        if (Auth::attempt($request->validated())) {
             $request->session()->regenerate();
 
             return redirect('/');

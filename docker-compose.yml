@@ -100,6 +100,10 @@ services:
             - '/dev/shm:/dev/shm'
         networks:
             - sail
+    maildev:
+        image: maildev/maildev
+        ports:
+            - "1080:1080"
 networks:
     sail:
         driver: bridge

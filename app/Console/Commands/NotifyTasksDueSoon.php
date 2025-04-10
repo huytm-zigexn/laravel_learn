@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\SendTaskDueEmail;
 use App\Models\Task;
-use App\Notifications\TaskDueSoonNotification;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
@@ -21,24 +21,29 @@ class NotifyTasksDueSoon extends Command
      *
      * @var string
      */
-    protected $description = 'Notify users about tasks due in the next 5 minutes';
+    protected $description = 'Check for tasks due in the next 5 minutes and queue email notifications';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $tasks = Task::with('users')
-            ->whereNotNull('due_date')
-            ->whereBetween('due_date', [Carbon::now(), Carbon::now()->copy()->addMinutes(5)])
-            ->get();
+        $now = Carbon::now();
+        $fiveMinutesFromNow = Carbon::now()->addMinutes(5);
 
-        foreach ($tasks as $task) {
-            foreach ($task->users as $user) {
-                $user->notify(new TaskDueSoonNotification($task)); // queued notification
-            }
+        // Find tasks with due dates in the next 5 minutes
+        $upcomingTasks = Task::where(function ($query) use ($now, $fiveMinutesFromNow) {
+            $query->where('due_date', '>=', $now)->where('due_date', '<=', $fiveMinutesFromNow);
+        })
+        ->get();
+
+        $this->info("Found {$upcomingTasks->count()} tasks due in the next 5 minutes");
+
+        foreach ($upcomingTasks as $task) {
+            // Dispatch a job to send email for each task
+            SendTaskDueEmail::dispatch($task);
         }
 
-        $this->info('Notifications sent for tasks due soon.');
+        return 0;
     }
 }

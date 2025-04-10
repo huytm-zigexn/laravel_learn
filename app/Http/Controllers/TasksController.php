@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\TaskRequestValidate;
 use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Models\Group;
@@ -26,19 +27,9 @@ class TasksController extends Controller
         return view('tasks.create', compact('groups', 'users'));
     }
 
-    public function store(Request $request)
+    public function store(TaskRequestValidate $request)
     {
         $thumbnailPath = null;
-        
-        $request->validate([
-            'name' => 'required|alpha_dash:ascii|max:255',
-            'description' => 'nullable',
-            'group_id' => 'required|exists:groups,id',
-            'due_date' => 'nullable|date|after:now',
-            'thumbnail' => 'nullable|image|max:2048',
-            'users' => 'nullable|array',
-            'users.*' => 'exists:users,id',
-        ]);
         
         if ($request->hasFile('thumbnail')) {
             $thumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
@@ -65,7 +56,7 @@ class TasksController extends Controller
 
     public function update(string $id)
     {
-        $task = $this->find_by_id($id);
+        $task = Task::findOrFail($id);
         $users = User::get();
         Gate::authorize('update', $task);
         $groups = Group::get();
@@ -77,19 +68,9 @@ class TasksController extends Controller
         return view('tasks.update', compact('task', 'groups', 'users'));
     }
 
-    public function edit(Request $request, string $id)
+    public function edit(TaskRequestValidate $request, string $id)
     {
         $thumbnailPath = null;
-
-        $request->validate([
-            'name' => 'required|alpha_dash:ascii|max:255',
-            'description' => 'nullable',
-            'group_id' => 'required|exists:groups,id',
-            'due_date' => 'nullable|date|after:now',
-            'thumbnail' => 'nullable|image|max:2048',
-            'users' => 'nullable|array',
-            'users.*' => 'exists:users,id',
-        ]);
 
         if ($request->hasFile('thumbnail')) {
             $thumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
@@ -118,10 +99,5 @@ class TasksController extends Controller
         Gate::authorize('delete', $task);
         $task->delete();
         return redirect()->route('app')->with('success', 'Task deleted successfully!');
-    }
-
-    private function find_by_id(string $id)
-    {
-        return Task::find($id);
     }
 }

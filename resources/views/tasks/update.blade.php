@@ -11,7 +11,7 @@
             </ul>
         </div>
     @endif
-    <form action="/tasks/{{ $task->id }}" method="POST" enctype="multipart/form-data">
+    <form action={{ route('update_task', $task->id) }} method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         <label for="name">Task name:</label><br>
